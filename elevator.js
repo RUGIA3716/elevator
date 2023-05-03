@@ -89,10 +89,10 @@ class Elevator {
         }
         console.log('elevator is active. keep working. status : ' + this.status);
         this.work();
-        if(this.stack_button.length == 0 && this.status == 0){
+        if (this.stack_button.length == 0 && this.status == 0) {
             this.active = false;
         }
-        setTimeout(() => { this.run(); }, 200);
+        setTimeout(() => { this.run(); }, 500);
     }
     work() {
         // 停止中であること。
@@ -143,15 +143,29 @@ class Elevator {
             }
             else {
                 console.log('移動中です。');
+
+
+
                 console.log('目的の' + this.temp_target_floor + '階を目指し動きます。');
                 if (this.temp_direction == 1) {
                     console.log(' \t ' + this.now_floor + '階 -> ' + (this.now_floor + 1) + '階');
+                    if (this.now_floor + 1 > this.relation_floor[0].get_top_floor()) {
+                        console.log('エレベーターは存在しない階に行こうとしています。');
+                        this.error_stop();
+                    }
                     this.now_floor += 1;
                 }
                 else {
                     console.log(' \t ' + this.now_floor + '階 -> ' + (this.now_floor - 1) + '階');
+                    if (this.now_floor - 1 < this.relation_floor[0].get_bottom_floor()) {
+                        console.log('エレベーターは存在しない階に行こうとしています。');
+                        this.error_stop();
+                    }
                     this.now_floor -= 1;
                 }
+
+
+
             }
         }
         else if (this.status == 2) {
@@ -181,6 +195,7 @@ class Elevator {
         }
         else if (this.status == 3) {
             console.log('乗客を乗せたため移動を開始します。\n現在乗客は' + this.passangers.length + '人です。');
+            console.table(this.passangers);
 
             // 止まれる階層をリストアップ
             // -> 止まれる階層でボタンを押されたら場合は止まる予定のリストに追加を行う。F
@@ -195,12 +210,21 @@ class Elevator {
             console.log('目的の' + this.temp_target_floor + '階を目指し動きます。');
             if (this.temp_direction == 1) {
                 console.log(' \t ' + this.now_floor + '階 -> ' + (this.now_floor + 1) + '階');
+                if (this.now_floor + 1 > this.relation_floor[0].get_top_floor()) {
+                    console.log('エレベーターは存在しない階に行こうとしています。');
+                    this.error_stop();
+                }
                 this.now_floor += 1;
             }
             else {
                 console.log(' \t ' + this.now_floor + '階 -> ' + (this.now_floor - 1) + '階');
+                if (this.now_floor - 1 < this.relation_floor[0].get_bottom_floor()) {
+                    console.log('エレベーターは存在しない階に行こうとしています。');
+                    this.error_stop();
+                }
                 this.now_floor -= 1;
             }
+
             // 止まる対象の階になった場合
             if (this.now_floor == this.temp_target_floor) {
                 console.log('目的の' + this.temp_target_floor + '階に到着しました。');
@@ -212,6 +236,7 @@ class Elevator {
         }
         else if (this.status == 4) {
             console.log('乗客の乗り降りを行うため停車します。\n現在乗客は' + this.passangers.length + '人です。');
+            console.table(this.passangers);
             // 乗客をリリース
             this.relese_passangers();
 
@@ -220,13 +245,14 @@ class Elevator {
 
             // 乗客の行先階をソートする
             this.sort_passangers_hope();
+            console.log(this.target_floors);
+
+
             console.log('行先階をソートし表示します。');
             console.log(this.target_floors);
 
             // 本来乗客がいるはずだが一人もいなかった場合に動作を停止する
             if (this.passangers.length == 0) {
-
-
                 console.log('乗客がいませんでした。動作を停止します。');
                 console.log(this.now_floor + '階にて停止します。');
                 this.status = 0;
@@ -249,7 +275,7 @@ class Elevator {
             // 途中の行先を更新
             this.temp_target_floor = this.target_floors.shift();
 
-            if (this.final_target_floor == this.temp_target_floor) {
+            if (this.final_target_floor == this.now_floor) {
                 // 乗客をすべて削除
                 console.log('最終目的階に到着しました。');
                 console.log('乗客を消去します。');
@@ -281,42 +307,57 @@ class Elevator {
         for (let i = 0; i < this.relation_floor.length; ++i) {
             if (this.relation_floor[i].floor == this.now_floor) {
                 if (this.final_direction == 1) {
-                    console.log('上へ向かう乗客を取得します。');
                     let passangers = this.relation_floor[i].get_up_passanger();
                     console.table(passangers);
-                    console.log('乗客人数は' + passangers.length + '人です。');
+                    console.log('↑上へ向かう乗客を取得します。');
                     passangers.length == 0 ? false : this.passangers = this.passangers.concat(passangers)
                 }
                 else {
-                    console.log('下へ向かう乗客を取得します。');
                     let passangers = this.relation_floor[i].get_down_passanger();
                     console.table(passangers);
-                    console.log('乗客人数は' + passangers.length + '人です。');
+                    console.log('↓下へ向かう乗客を取得します。');
                     passangers.length == 0 ? false : this.passangers = this.passangers.concat(passangers)
                 }
-                console.table(this.passangers);
+                // console.table(this.passangers);
                 return;
             }
         }
     }
-    relese_passangers() {
-        console.log('乗客を降ろします。');
-        let counter = 0;
-        for (let i = 0; i < this.passangers.length; ++i) {
-            if (this.passangers[i].hope_floor == this.now_floor) {
-                this.passangers.splice(i, 1);
-                ++counter;
-            }
-        }
-        console.log(' -> ' + counter + '人を降ろしました。');
-
-    }
-
     sort_passangers_hope() {
         for (let i = 0; i < this.passangers.length; ++i) {
             this.add_target_floor(this.passangers[i].hope_floor)
         }
     }
+    relese_passangers() {
+        console.log('乗客を降ろします。');
+        let counter = 0;
+        let buffer = []
+        for (let i = 0; i < this.passangers.length; ++i) {
+            if (this.passangers[i].hope_floor == this.now_floor) {
+                buffer.push(this.passangers.splice(i, 1));
+                --i;
+                ++counter;
+            }
+        }
+        console.log(' -> ' + counter + '人を降ろしました。');
+        for (let i = 0; i < this.relation_floor.length; ++i) {
+            if (this.relation_floor[i].floor == this.now_floor) {
+                this.relation_floor[i].set_relese_passanger(buffer);
+            }
+        }
+    }
+    relese_force_passangers() {
+        console.log('乗客を降ろします。');
+        let counter = 0;
+        for (let i = 0; i < this.passangers.length; ++i) {
+            this.passangers.splice(i, 1);
+            --i;
+            ++counter;
+        }
+        console.log(' -> ' + counter + '人を降ろしました。');
+    }
+
+
     add_target_floor(floor_num) {
         // 方向によって一番目を変更する
         for (let i = 0; i < this.target_floors; ++i) {
@@ -354,7 +395,12 @@ class Elevator {
         // 上に向かうなら上に近いところをとったほうがいいかと思ったが今回はスタック形式にするため無効
         // また、最短距離と時間ごとで区切るのもいいかもしれない。
         // this.relation_floor[0].get_top_floor();
+        console.log('止まれる階層を生成します。');
+        console.log('現在のエレベーターの位置 : ' + this.now_floor + '階');
+        console.log('現在のエレベーターの目標 : ' + this.final_target_floor + '階');
+        console.log('現在のエレベーターの方向 : ' + this.final_direction);
         if (this.available_stop_floors.length == 0) {
+            console.log('止まれる階層が一つも存在しないため一から生成します。');
             this.available_stop_floors = [];
             for (let i = this.now_floor; i < this.final_target_floor; ++i) {
                 if (this.final_direction == 1) {
@@ -364,6 +410,8 @@ class Elevator {
                     this.available_stop_floors.push(i - 1);
                 }
             }
+            console.log('生成した結果を表示します。');
+            console.table(this.available_stop_floors);
         }
         // 止まる予定の最上階のデータが入っていない場合に更新を行う
         let stop_top_floor = this.available_stop_floors[this.available_stop_floors.length - 1];
@@ -377,8 +425,10 @@ class Elevator {
                 }
             }
         }
-        console.log('止まれる階層のリスト生成');
-        console.log(this.available_stop_floors);
+        console.log('止まれる階層の全リスト');
+        console.table(this.available_stop_floors);
+        // console.log('止まれる階層のリスト生成');
+        // console.log(this.available_stop_floors);
         // 一番近い止まれる階を求める
         let bottom_stop_floor = this.now_floor + 1;
         let top_stop_floor = this.now_floor - 1;
@@ -403,7 +453,7 @@ class Elevator {
             }
         }
         console.log('止まれる階層のリストの調整後');
-        console.log(this.available_stop_floors);
+        console.table(this.available_stop_floors);
     }
     search_stop_list() {
         for (let i = 0; i < this.available_stop_floors.length; ++i) {
@@ -436,5 +486,17 @@ class Elevator {
             }
 
         }
+    }
+    error_stop() {
+        alert('不具合が発生しました。');
+        console.log('乗客を全員降ろします。');
+        this.relese_force_passangers();
+        this.status = 0;
+        this.passangers = [];
+        this.final_target_floor = 0;
+        this.temp_target_floor = 0;
+        this.final_direction = 0;
+        this.temp_direction = 0;
+        this.available_stop_floors = [];
     }
 }

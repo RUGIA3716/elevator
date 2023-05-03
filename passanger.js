@@ -20,9 +20,14 @@ class Passanger {
                 candidate_distination_list.push(i);
             }
         }
+        
+        // console.log('候補');
+        // console.table(candidate_distination_list);
+
         let r = Math.floor(Math.random() * (candidate_distination_list.length));
         this.hope_floor = candidate_distination_list[r];
         this.hope_floor > this.now_floor ? this.direction = 1 : this.direction = -1;
+        // console.log('now_floor : ' + this.now_floor + '   hope_floor : ' + this.hope_floor + ' >> ' + this.direction);
     }
     setfloor(set_floor) {
         // 希望階層と設定される階層が同じ場合にのみ設定を行う

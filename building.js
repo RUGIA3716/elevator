@@ -62,23 +62,23 @@ class Building {
         let floor_str2 = '';
         let floor_str_num = [];
 
-        for (let i = 0; i < this.floor.length; ++i) {
-            let uplamp = this.floor[i].get_up_button() ? '○' : '●';
-            let downlamp = this.floor[i].get_down_button() ? '○' : '●';
+        for (let i = this.floor_length - 1; i >= 0; --i) {
+            let uplamp = this.floor[i].get_up_button() ? '●' : '○';
+            let downlamp = this.floor[i].get_down_button() ? '●' : '○';
             let up_human = this.get_human(this.floor[i], 1);
             let down_human = this.get_human(this.floor[i], -1);
-            floor_str.push(' ↑ ' + uplamp + ' : ' + up_human + '\n' + ' ↓ ' + downlamp + ' : ' + down_human);
-            floor_str2 += ' ↑ ' + uplamp + ' : ' + up_human + '<br>' + ' ↓ ' + downlamp + ' : ' + down_human + '<br><br>';
+            let relese_human = this.get_human(this.floor[i], 0);
+            floor_str2 += this.floor[i].floor + '. ↑ ' + uplamp + ' : ' + up_human + '<br>' + '階 ↓ ' + downlamp + ' : ' + down_human + '<br> -> ' + relese_human + '<br><br>';
             floor_str_num.push(this.floor[i].floor);
         }
-        for (let i = 0; i < this.elevator_manager.elevator.length; ++i) {
+        for (let i = this.elevator_manager.elevator.length - 1; i >= 0; --i) {
             let elevetor_now_floor_index = 0;
             for (let j = 0; j < floor_str_num.length; ++j) {
                 if (floor_str_num[j] == this.elevator_manager.elevator[i].now_floor) {
-                    el_str += '| ||| |<br>| ||| |<br><br>'
+                    el_str += '<br>|' + this.el_get_human(this.elevator_manager.elevator[i], true) + '|<br><br><br>'
                 }
                 else {
-                    el_str += '| - - |<br>| - - |<br><br>'
+                    el_str += '<br>  ' + this.el_get_human(this.elevator_manager.elevator[i], false) + '<br><br><br>'
                 }
             }
             el_str2 += 'status : ' + this.elevator_manager.elevator[i].status + '<br>乗客人数 : ' + this.elevator_manager.elevator[i].passangers.length + '人' + '<br>';
@@ -89,8 +89,30 @@ class Building {
     get_human(floor, direction) {
         let out = '';
         let human_num = direction == 1 ? floor.up_passangers.length : floor.down_passangers.length;
+        if(direction == 0){
+            human_num = floor.relese_passangers.length;
+        }
         for (let i = 0; i < human_num; ++i) {
             out += '👤';
+        }
+        return out;
+    }
+    el_get_human(elevator, bool){
+        let out = '';
+        let passanger_num = elevator.passangers.length;
+        for(let i = 0; i < 10; ++i){
+            if(passanger_num > 0 && bool){
+                out += '👤';
+                --passanger_num;
+            }
+            else{
+                if(bool == false){
+                    out += ''
+                }
+                else{
+                    out += '__';
+                }
+            }
         }
         return out;
     }
