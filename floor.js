@@ -4,7 +4,7 @@ class Floor {
     #down_floor;
     #up_button;
     #down_button;
-    constructor({floor, upfloor, downfloor, elevator_manager}) {
+    constructor({ floor, upfloor, downfloor, elevator_manager }) {
         // 秘匿
         this.#up_floor = typeof upfloor == 'undefined' ? 0 : upfloor;
         this.#down_floor = typeof downfloor == 'undefined' ? 0 : downfloor;
@@ -41,7 +41,7 @@ class Floor {
         return this.#down_floor.get_bottom_floor();
     }
     createPassanger() {
-        if (Math.random() * 100 - 90 > 0) {
+        if (Math.random() * 100 - 20 > 0) {
             // console.log('乗客を生成します。');
             let p = new Passanger({ top_floor: this.get_top_floor(), bottom_floor: this.get_bottom_floor(), now_floor: this.floor });
             if (p.direction == 1) {
@@ -58,7 +58,7 @@ class Floor {
         if (this.#up_button) {
             return false;
         }
-        console.log(this.floor + '上ボタンを押しました');
+        console.log(this.floor + '階で上ボタンが押されました');
         this.#up_button = true;
         // ボタンを押したときにエレベーターをアクティブにする
         this.elevator_manager.run(this.floor, 1);
@@ -67,20 +67,47 @@ class Floor {
         if (this.#down_button) {
             return false;
         }
-        console.log(this.floor + '下ボタンを押しました');
+        console.log(this.floor + '階で下ボタンが押されました');
         this.#down_button = true;
         this.elevator_manager.run(this.floor, -1);
     }
-    turn_off_up_button(){
+
+    turn_off_up_button() {
         this.#up_button = false;
     }
-    turn_off_down_button(){
+    turn_off_down_button() {
         this.#down_button = false;
     }
-    get_up_passanger() {
-        return this.up_passangers.shift(this.up_passangers.length);
+
+    get_up_button() {
+        return this.#up_button == true ? true : false;
     }
-    get_down_passanger(){
+    get_down_button() {
+        return this.#down_button == true ? true : false;
+    }
+
+
+
+    get_up_passanger() {
+        if (this.up_passangers.length == 0) {
+            return [];
+        }
+        if (this.up_passangers.length == 1) {
+            return [this.up_passangers.shift()];
+        }
+        let buffer = [];
+        for(let i = 0; i < this.up_passangers.length; ++i){
+            buffer.push(this.up_passangers.shift());
+        }
+        return buffer;
+    }
+    get_down_passanger() {
+        if (this.down_passangers.length == 0) {
+            return [];
+        }
+        if (this.down_passangers.length == 1) {
+            return [this.down_passangers.shift()];
+        }
         return this.down_passangers.shift(this.down_passangers.length);
 
     }
@@ -95,6 +122,6 @@ class Floor {
         // floor の up_butotn, down_butotn が押されたときにelevatorにイベントをひっかけて向かう
 
 
-        setTimeout(() => { this.run(); }, 1000);
+        setTimeout(() => { this.run(); }, 200);
     }
 }

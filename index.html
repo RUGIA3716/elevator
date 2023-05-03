@@ -14,11 +14,17 @@
 
 <body>
     <!-- 京都駅の都通りにある水が落ちてくるやつを作ってもいいかも -->
+    <div id = 'monitor1' style = 'position: absolute; top: 0px; left: 0px;'>
+
+    </div>
+    <div id = 'monitor2' style = 'position: absolute; top: 0px; left: 70px;'>
+
+    </div>
 </body>
 <script>
     'use strict'
     // オブジェクトを使うと引数に渡す名前を指定できる。(ただし、これはあくまでもオブジェクトとして変換して送っているだけ)
-    let bill_1 = new Building({ name: '二階建て', bottom_floor: 1, top_floor: 3, ele_num: 1 });
+    let bill_1 = new Building({ name: '二階建て', bottom_floor: 1, top_floor: 5, ele_num: 1 });
     console.log(bill_1);
 </script>
 
