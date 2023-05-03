@@ -16,7 +16,9 @@
     <!-- 京都駅の都通りにある水が落ちてくるやつを作ってもいいかも -->
 </body>
 <script>
-    let bill_1 = new Building('二階建て', 1, 10, 1);
+    'use strict'
+    // オブジェクトを使うと引数に渡す名前を指定できる。(ただし、これはあくまでもオブジェクトとして変換して送っているだけ)
+    let bill_1 = new Building({ name: '二階建て', bottom_floor: 1, top_floor: 3, ele_num: 1 });
     console.log(bill_1);
 </script>
 
