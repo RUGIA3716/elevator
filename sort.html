@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <title>bubble sort</title>
+        <!-- <link rel="stylesheet" href="reset.css"> -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <style>
+            td {
+                border: black 1px solid;
+                width: 40px;
+                text-align: center;
+                font-weight: bold;
+            }
+
+            th {
+                width: 40px;
+                text-align: center;
+            }
+
+            #dv1 {
+                display: none;
+            }
+
+            .red {
+                color: red;
+            }
+
+            .spc {
+                height: 10px;
+            }
+
+            a {
+                text-decoration: none;
+            }
+
+            .aqua {
+                background-color: aqua;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>バブルソート</h1>
+        <p>
+            桁数
+
+        
+            <select name="" id="slct">
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8" selected>8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+            </select>
+            で配列を <button id="btn1" onclick="makeArray()">作成</button>
+            <button>
+                <a href="bubblesort.html">リセット</a>
+            </button>
+        </p>
+        <table id="tbl1"></table>
+        <div id="dv1">
+            <hr/>
+            この配列を　<button onclick="bsort(a, 'ascR')">昇順右</button>
+            <button onclick="bsort(a, 'ascL')">昇順左</button>
+            <button onclick="bsort(a, 'descR')">降順右</button>
+            ソート
+
+    
+        </div>
+        <table id="tbl2"></table>
+        <script>
+
+            let a = [];
+            // 配列はグローバル
+
+            let sflag;
+            // 昇順・降順フラグ
+
+            // 配列作成関数
+
+            function makeArray() {
+
+                $("#dv1").css("display", "inline");
+
+                // 配列をリセット
+
+                a = [];
+
+                let k = 0;
+
+                // 配列の要素数
+
+                let len = document.getElementById("slct").value;
+
+                while (k < len - 1) {
+
+                    // 要素を生成
+
+                    let tmp = Math.floor(Math.random() * 100);
+
+                    if (tmp < 1 || !tmp) {
+
+                        tmp = 1;
+
+                    }
+
+                    // 配列が空なら次の重複チェック文のために一つ要素を入れておく
+
+                    if (!a.length) {
+
+                        a.push(tmp);
+
+                    } else {
+
+                        // 重複をチェックして要素を追加
+
+                        let flag = 0;
+
+                        for (let j = 0; j < a.length; j++) {
+
+                            // 重複する数字があるときは要素を追加しない
+
+                            if (a[j] == tmp) {
+
+                                flag = 1;
+
+                            }
+
+                        }
+
+                        if (flag == 0) {
+
+                            a.push(tmp);
+
+                            k++;
+
+                        }
+
+                    }
+
+                }
+
+                makeTr(a, "tbl1", 0);
+
+                // return a;
+
+            }
+
+            // 表示行作成関数
+
+            function makeTr(array, id, n, j, k) {
+
+                let tr = "<tr><th>" + n + "</th>";
+
+                for (let i = 0; i < array.length; i++) {
+
+                    tr += "<td class='";
+
+                    if (i == j || i == j + 1) {
+
+                        tr += "red";
+
+                    }
+
+                    if (i == k) {
+
+                        if ((sflag == 1 && i == j + 1) || (sflag == 0 && i == j)) {
+
+                            tr += " aqua";
+
+                        }
+
+                    }
+
+                    tr += "'>" + array[i] + "</td>";
+
+                }
+
+                tr += "</tr>";
+
+                id = "#" + id;
+
+                $(id).append(tr);
+
+            }
+
+            // bsort関数
+
+            function bsort(array, d) {
+
+                let len = array.length;
+
+                let n = 0;
+
+                let k;
+                // 完成マスの色をつけるための変数
+
+                switch (d) {
+
+                case "ascR":
+
+                    k = len - 1;
+
+                    sflag = 1;
+
+                    // 昇順で右側から決めるための外側ループ
+
+                    for (let i = 0; i < len; i++) {
+
+                        for (let j = 0; j < len - i; j++) {
+
+                            n++;
+
+                            if (array[j] > array[j + 1]) {
+
+                                [array[j],array[j + 1]] = [array[j + 1], array[j]];
+
+                                makeTr(array, "tbl2", n, j, k);
+
+                            }
+
+                        }
+
+                        k--;
+
+                    }
+
+                    break;
+
+                case "ascL":
+
+                    k = 0;
+
+                    sflag = 0;
+
+                    // 昇順左側から決めるための外側ループ
+
+                    for (let i = len; i > 0; i--) {
+
+                        for (let j = len - 1; j > 0; j--) {
+
+                            n++;
+
+                            if (array[j - 1] > array[j]) {
+
+                                [array[j - 1],array[j]] = [array[j], array[j - 1]];
+
+                                makeTr(array, "tbl2", n, j - 1, k);
+
+                            }
+
+                        }
+
+                        k++;
+
+                    }
+
+                    break;
+
+                case "descR":
+
+                    k = len - 1;
+
+                    sflag = 1;
+
+                    // 降順で右側から決めるための外側ループ
+
+                    for (let i = 0; i < len; i++) {
+
+                        for (let j = 0; j < len - i; j++) {
+
+                            n++;
+
+                            if (array[j] < array[j + 1]) {
+
+                                [array[j],array[j + 1]] = [array[j + 1], array[j]];
+
+                                makeTr(array, "tbl2", n, j, k);
+
+                            }
+
+                        }
+
+                        k--;
+
+                    }
+
+                    break;
+
+                }
+
+                // 完成行の色を変え、下に余白を作る
+
+                if (n > 0) {
+
+                    $("#tbl2 tr:last").css("background-color", "palegreen");
+
+                    $("#tbl2").append(
+                    "<tr><th class='spc' colspan='" + len + "'></th></tr>"
+                    );
+
+                }
+
+                // プログラムのは直接関係ないオブジェクト
+
+                const ob = {
+                    array,
+                    min: array[0],
+                    max: array[len - 1]
+                };
+
+                return ob;
+
+            }
+        </script>
+    </body>
+</html>
