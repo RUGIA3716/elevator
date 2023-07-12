@@ -46,8 +46,6 @@
     <h1>バブルソート</h1>
     <p>
         桁数
-
-
         <select name="" id="slct">
             <option value="2">2</option>
             <option value="3">3</option>
@@ -55,7 +53,7 @@
             <option value="5">5</option>
             <option value="6">6</option>
             <option value="7">7</option>
-            <option value="8" selected>8</option>
+            <option value="8">8</option>
             <option value="9">9</option>
             <option value="10">10</option>
             <option value="11">11</option>
@@ -63,7 +61,7 @@
             <option value="13">13</option>
             <option value="14">14</option>
             <option value="15">15</option>
-            <option value="16">16</option>
+            <option value="16" selected>16</option>
         </select>
         で配列を <button id="btn1" onclick="makeArray()">作成</button>
         <button>
@@ -76,6 +74,7 @@
         この配列を　<button onclick="bsort(a, 'ascR')">昇順右</button>
         <button onclick="bsort(a, 'ascL')">昇順左</button>
         <button onclick="bsort(a, 'descR')">降順右</button>
+        <button onclick="bsort(a, 'descL')">降順左</button>
         ソート
 
 
@@ -87,48 +86,70 @@
 
         let sflag; // 昇順・降順フラグ
 
+        let array_created = false;
         // 配列作成関数
         function makeArray() {
-            $("#dv1").css("display", "inline");
-            // 配列をリセット
-            a = [];
-            let k = 0;
-            // 配列の要素数
-            let len = document.getElementById("slct").value;
-            while (k < len - 1) {
-                // 要素を生成
-                let tmp = Math.floor(Math.random() * 100);
-                if (tmp < 1 || !tmp) {
-                    tmp = 1;
-                }
+            console.log('makeArray');
+            if (array_created == false) {
+                array_created = true;
+                $("#dv1").css("display", "inline");
+                // 配列をリセット
+                a = [];
+                let k = 0;
+                // 配列の要素数
+                let len = document.getElementById("slct").value;
+                while (k < len - 1) {
+                    // 要素を生成
+                    let tmp = Math.floor(Math.random() * 100);
+                    if (tmp < 1 || !tmp) {
+                        tmp = 1;
+                    }
 
-                // 配列が空なら次の重複チェック文のために一つ要素を入れておく
-                if (!a.length) {
-                    a.push(tmp);
-                } else {
-                    // 重複をチェックして要素を追加
-                    let flag = 0;
-                    for (let j = 0; j < a.length; j++) {
-                        // 重複する数字があるときは要素を追加しない
-                        if (a[j] == tmp) {
-                            flag = 1;
+                    // 配列が空なら次の重複チェック文のために一つ要素を入れておく
+                    if (!a.length) {
+                        a.push(tmp);
+                    } else {
+                        // 重複をチェックして要素を追加
+                        let flag = 0;
+                        for (let j = 0; j < a.length; j++) {
+                            // 重複する数字があるときは要素を追加しない
+                            if (a[j] == tmp) {
+                                flag = 1;
+                            }
+                        }
+                        if (flag == 0) {
+                            a.push(tmp);
+                            k++;
                         }
                     }
-                    if (flag == 0) {
-                        a.push(tmp);
-                        k++;
-                    }
                 }
+                makeTr(a, "tbl1", 0);
+                // return a;
             }
-            makeTr(a, "tbl1", 0);
-            // return a;
+            else {
+                let chiled_length = $('#tbl1').children().length;
+                for (let i = chiled_length; i > 0; --i) {
+                    console.log('remove');
+                    $('#tbl1').children()[i - 1].remove();
+                }
+                array_created = false;
+                makeArray();
+            }
+            buffer_th_counter = 0;
         }
-
+        let buffer_k = 0;
+        let buffer_th_counter = 0;
         // 表示行作成関数
-        function makeTr(array, id, n, j, k) {
-            let tr = "<tr><th>" + n + "</th>";
+        function makeTr(array, id, n, j, k, d) {
+            // nは入れ替えた総回数っぽい
+            // j は入れ替えが発生した場所
+            // k は現在の入れ替え目標
+            // 入れ替え目標まで到達(最大回数で入れ替えを行った)した場合は水色が出せるが、一回でも最大より早く終わると色がつかなくなる。
+            // console.log('n : ' + n + ' j : ' + j + ' k : ' + k);
+            let tr = "<tr id='tr" + buffer_th_counter + "'><th>" + buffer_th_counter + "</th>";
             for (let i = 0; i < array.length; i++) {
                 tr += "<td class='";
+                // 現在入れ替えている場所と、その隣を赤色に変更
                 if (i == j || i == j + 1) {
                     tr += "red";
                 }
@@ -142,26 +163,46 @@
             tr += "</tr>";
             id = "#" + id;
             $(id).append(tr);
+            if (buffer_k != k && buffer_k != 0 && (typeof k != 'undefined' && typeof buffer_k != 'undefined')) {
+                console.log(buffer_k + ' : ' + k + ' d:' + d);
+                console.log($('#tr' + (buffer_th_counter - 1)).children()[buffer_k + 1].classList);
+                console.log(buffer_k + ' : ' + k);
+                $('#tr' + (buffer_th_counter - 1)).children()[buffer_k + 1].classList.add("aqua");
 
+            }
+            buffer_k = k;
+            ++buffer_th_counter;
         }
 
+        let sorted = false;
         // bsort関数
         function bsort(array, d) {
+            if (sorted) {
+                let chiled_length = $('#tbl2').children().length;
+                for (let i = chiled_length; i > 0; --i) {
+                    console.log('remove');
+                    $('#tbl2').children()[i - 1].remove();
+                }
+                buffer_k = 0;
+                buffer_th_counter = 0;
+            }
+            sorted = true;
             let len = array.length;
             let n = 0;
             let k;
+
             // 完成マスの色をつけるための変数
             switch (d) {
                 case "ascR":
                     k = len - 1;
                     sflag = 1;
                     // 昇順で右側から決めるための外側ループ
-                    for (let i = 0; i < len; i++) {
-                        for (let j = 0; j < len - i; j++) {
+                    for (let i = 0; i < len; ++i) {
+                        for (let j = 0; j < len - i; ++j) {
                             n++;
                             if (array[j] > array[j + 1]) {
                                 [array[j], array[j + 1]] = [array[j + 1], array[j]];
-                                makeTr(array, "tbl2", n, j, k);
+                                makeTr(array, "tbl2", n, j, k, d);
                             }
                         }
                         k--;
@@ -171,12 +212,12 @@
                     k = 0;
                     sflag = 0;
                     // 昇順左側から決めるための外側ループ
-                    for (let i = len; i > 0; i--) {
-                        for (let j = len - 1; j > 0; j--) {
+                    for (let i = len; i > 0; --i) {
+                        for (let j = len - 1; j > 0; --j) {
                             n++;
                             if (array[j - 1] > array[j]) {
                                 [array[j - 1], array[j]] = [array[j], array[j - 1]];
-                                makeTr(array, "tbl2", n, j - 1, k);
+                                makeTr(array, "tbl2", n, j - 1, k, d);
                             }
                         }
                         k++;
@@ -186,15 +227,30 @@
                     k = len - 1;
                     sflag = 1;
                     // 降順で右側から決めるための外側ループ
-                    for (let i = 0; i < len; i++) {
-                        for (let j = 0; j < len - i; j++) {
+                    for (let i = 0; i < len; ++i) {
+                        for (let j = 0; j < len - i; ++j) {
                             n++;
                             if (array[j] < array[j + 1]) {
                                 [array[j], array[j + 1]] = [array[j + 1], array[j]];
-                                makeTr(array, "tbl2", n, j, k);
+                                makeTr(array, "tbl2", n, j, k, d);
                             }
                         }
                         k--;
+                    }
+                    break;
+                case "descL":
+                    k = 0;
+                    sflag = 0;
+                    // 降順左側から決めるための外側ループ
+                    for (let i = len; i > 0; --i) {
+                        for (let j = len - 1; j > 0; --j) {
+                            n++;
+                            if (array[j - 1] < array[j]) {
+                                [array[j - 1], array[j]] = [array[j], array[j - 1]];
+                                makeTr(array, "tbl2", n, j - 1, k, d);
+                            }
+                        }
+                        k++;
                     }
                     break;
             }
@@ -204,6 +260,20 @@
                 $("#tbl2").append(
                     "<tr><th class='spc' colspan='" + len + "'></th></tr>"
                 );
+                switch (d) {
+                    case "ascR":
+                    case "descR":
+                        for (let i = 0; i < buffer_k - k; ++i) {
+                            $('#tr' + (buffer_th_counter - 1)).children()[buffer_k + 1 - i].classList.add("aqua");
+                        }
+                        break;
+                    case "ascL":
+                    case "descL":
+                        for (let i = 0; i < k - buffer_k; ++i) {
+                            $('#tr' + (buffer_th_counter - 1)).children()[buffer_k + 1 + i].classList.add("aqua");
+                        }
+                        break;
+                }
             }
             // プログラムのは直接関係ないオブジェクト
             const ob = {
